@@ -28,9 +28,20 @@ static ObjString *allocateString(char *chars, int length,
   return string;
 }
 
+static uint32_t hashString(const char* key, int length) {
+  uint32_t hash = 2166136261u;
+
+  for (int i = 0; i < length; i++) {
+    hash ^= key[i];
+    hash *= 16777619;
+  }
+
+  return hash;
+}
+
 ObjString *takeString(char* chars, int length) {
   uint32_t hash = hashString(chars, length);
-  return allocateString(chars, length);
+  return allocateString(chars, length, hash);
 }
 
 ObjString *copyString(const char *chars, int length) {
@@ -40,7 +51,7 @@ ObjString *copyString(const char *chars, int length) {
   memcpy(heapChars, chars, length);
   heapChars[length] = '\0';
 
-  return allocateString(heapChars, length);
+  return allocateString(heapChars, length, hash);
 }
 
 void printObj(Value value) {
